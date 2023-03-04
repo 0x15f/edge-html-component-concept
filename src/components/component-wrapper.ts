@@ -10,6 +10,11 @@ export default async function componentWrapper(
     ...component,
     id,
     _promise: null,
+    options: {
+      blocking: component.options?.blocking ?? false,
+      template: component.options?.blocking ?? false,
+      preload: component.options?.blocking ?? false,
+    },
     _deferredFunction: async (request) =>
       component
         .function(request)

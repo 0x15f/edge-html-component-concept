@@ -3,10 +3,16 @@ import { Method } from '@worker-tools/shed'
 export {}
 
 declare global {
-  interface ComponentOptions {
+  interface PartialComponentOptions {
     blocking?: boolean
     template?: boolean
     preload?: boolean
+  }
+
+  interface ComponentOptions extends PartialComponentOptions {
+    blocking: boolean
+    template: boolean
+    preload: boolean
   }
 
   interface PartialComponent {
@@ -18,7 +24,7 @@ declare global {
     html: {
       selector: string
     }
-    options?: ComponentOptions
+    options?: PartialComponentOptions
     function: (request: Request) => Promise<Response>
   }
 
@@ -26,5 +32,6 @@ declare global {
     id: string
     _deferredFunction: (request: Request) => Promise<Response>
     _promise: Promise<Response> | null
+    options: ComponentOptions
   }
 }

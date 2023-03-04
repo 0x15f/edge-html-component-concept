@@ -26,6 +26,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       },
       options: {
         blocking: true,
+        preload: true,
       },
       function: async () => {
         const postsPromise = fetch(
@@ -46,9 +47,9 @@ export default async function handler(event: FetchEvent): Promise<Response> {
     if (url.pathname.match(selector) && request.method.match(method)) {
       timesToWait++
       const component = await componentWrapper(partialComponent)
-      if (component.options?.preload) component._promise = component.function(requestClone)
+      if (component.options.preload) component._promise = component.function(requestClone)
       // preloading makes the component blocking
-      const rewriterClass = (component.options?.blocking || component.options?.preload)
+      const rewriterClass = (component.options.blocking || component.options.preload)
         ? BlockingComponentRewriter
         : NonBlockingComponentRewriter
       rewriter.on(
