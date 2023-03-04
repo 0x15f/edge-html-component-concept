@@ -1,3 +1,5 @@
+import { Method } from '@worker-tools/shed'
+
 export {}
 
 /**
@@ -11,6 +13,7 @@ declare global {
     name: string
     route: {
       selector: string
+      method: Method
     }
     html: {
       selector: string
