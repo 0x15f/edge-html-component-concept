@@ -1,10 +1,11 @@
-import { StreamResponse } from '@worker-tools/shed'
+import { BufferedStreamResponse, StreamResponse } from '@worker-tools/shed'
 import ComponentRewriter from './rewriter/ComponentRewriter'
 
-export async function route(request: Request): Promise<Response> {
+export async function route(request: Request): Promise<StreamResponse> {
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 
+  const buffer = !url.searchParams.has('_buffer')
   const components: Component[] = []
   const chunks: Chunk[] = []
 
@@ -13,7 +14,7 @@ export async function route(request: Request): Promise<Response> {
     if (url.pathname.match(component.route.selector))
       rewriter.on(
         component.html.selector,
-        new ComponentRewriter(requestClone, component, chunks),
+        new ComponentRewriter(requestClone, component, chunks, buffer),
       )
   })
 
@@ -41,7 +42,7 @@ export async function route(request: Request): Promise<Response> {
     // anything else can be done now
   }
 
-  return new StreamResponse(streamResponseWithComponents(), {
+  return new (buffer ? BufferedStreamResponse : StreamResponse)(streamResponseWithComponents(), {
     headers: {
       'Content-Type': 'text/html',
     },
