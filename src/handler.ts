@@ -51,7 +51,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       const response = await promise
       if (!response.body) continue
       await response.body.pipeTo(writable, {
-        preventClose: timesToWait === timesWaited,
+        preventClose: timesToWait !== timesWaited,
       })
       timesWaited++
     }
