@@ -4,7 +4,8 @@ import {
 } from '@worker-tools/shed'
 import ComponentRewriter from './rewriter/ComponentRewriter'
 
-export async function route(request: Request): Promise<StreamResponse> {
+export default async function handler(event: FetchEvent): Promise<StreamResponse> {
+  const { request } = event
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 

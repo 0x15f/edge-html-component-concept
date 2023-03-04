@@ -1,5 +1,5 @@
-import { route } from './router'
+import handler from './handler'
 
 addEventListener('fetch', (event: FetchEvent) => {
-  event.respondWith(route(event.request))
+  event.respondWith(handler(event))
 })
