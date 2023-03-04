@@ -1,11 +1,14 @@
 import hash from '../utils/hash'
 
 export default class ComponentRewriter {
+  protected request: Request
+
   protected component: Component
 
   protected chunks: Chunk[]
 
-  constructor(component: Component, chunks: Chunk[]) {
+  constructor(request: Request, component: Component, chunks: Chunk[]) {
+    this.request = request;
     this.component = component
     this.chunks = chunks
   }
@@ -15,7 +18,8 @@ export default class ComponentRewriter {
     element.setAttribute('id', id)
     this.chunks.push({
       id,
-      value: this.component.function(),
+      name: this.component.name,
+      value: this.component.function(this.request),
     })
   }
 }

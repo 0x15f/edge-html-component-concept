@@ -15,11 +15,12 @@ declare global {
     html: {
       selector: string
     }
-    function: () => Promise<string>
+    function: (request: Request) => Promise<string>
   }
 
   interface Chunk {
     id: string
+    name: string
     value: Promise<string>
   }
 }

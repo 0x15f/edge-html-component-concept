@@ -8,11 +8,12 @@ export async function route(request: Request): Promise<Response> {
   const components: Component[] = []
   const chunks: Chunk[] = []
 
+  const requestClone = request.clone()
   components.forEach((component) => {
     if (url.pathname.match(component.route.selector))
       rewriter.on(
         component.html.selector,
-        new ComponentRewriter(component, chunks),
+        new ComponentRewriter(requestClone, component, chunks),
       )
   })
 
