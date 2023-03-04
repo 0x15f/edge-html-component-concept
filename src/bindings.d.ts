@@ -6,10 +6,7 @@ export {}
  * Declare kv namespaces here so using them does not throw type errors
  */
 declare global {
-  // below is an example kv namespace binding
-  // const MY_NAMESPACE: KVNamespace
-
-  interface Component {
+  interface PartialComponent {
     name: string
     route: {
       selector: string
@@ -18,12 +15,10 @@ declare global {
     html: {
       selector: string
     }
-    function: (request: Request) => Promise<string>
+    function: (request: Request) => Promise<Response>
   }
 
-  interface Chunk {
+  interface Component extends PartialComponent {
     id: string
-    name: string
-    value: Promise<string>
   }
 }

@@ -1,58 +1,66 @@
-import {
-  BufferedStreamResponse,
-  StreamResponse,
-} from '@worker-tools/shed'
+import componentWrapper from './components/component-wrapper'
 import ComponentRewriter from './rewriter/ComponentRewriter'
 
-export default async function handler(event: FetchEvent): Promise<StreamResponse> {
+export default async function handler(event: FetchEvent): Promise<Response> {
   const { request } = event
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 
-  const buffer = !url.searchParams.has('_buffer')
-  const components: Component[] = []
-  const chunks: Chunk[] = []
+  const responses: Promise<Response>[] = [
+    fetch(request).then((response) => rewriter.transform(response)),
+  ]
 
-  const requestClone = request.clone()
-  components.forEach((component) => {
-    if (
-      url.pathname.match(component.route.selector) &&
-      request.method.match(component.route.method)
-    )
+  let timesToWait = 1
+  let timesWaited = 0
+  const components: PartialComponent[] = [
+    {
+      name: 'Jake Test',
+      route: {
+        method: 'GET',
+        selector: '/',
+      },
+      html: {
+        selector: '[example-fetch-data]',
+      },
+      function: async () => {
+        return new Response(
+          'This is jakes test data to insert into this component via the server',
+        )
+      },
+    },
+  ]
+  for (const component of components) {
+    const { method, selector } = component.route
+    if (url.pathname.match(selector) && request.method.match(method)) {
+      timesToWait++
       rewriter.on(
         component.html.selector,
-        new ComponentRewriter(requestClone, component, chunks, buffer),
+        new ComponentRewriter(
+          request.clone(),
+          await componentWrapper(component),
+          responses,
+        ),
       )
-  })
-
-  async function* streamResponseWithComponents() {
-    const selfDeleteTag = `const _self = document.currentScript;_self.parentNode.removeChild(_self)`
-    // awaited to prevent streaming of chunks prior to origin shell
-    const response = await fetch(request)
-    yield rewriter.transform(response).text()
-    if (request.headers.has('cookie'))
-      yield `<script>
-        document.cookie = ${JSON.stringify(request.headers.get('cookie'))}
-        ${selfDeleteTag}
-      </script>`
-
-    // let each promise resolve
-    for (const chunk of chunks)
-      chunk.value.then(
-        (val) =>
-          yield `<script>
-            document.querySelector(${JSON.stringify(chunk.id)}).innerHTML =
-              ${JSON.stringify(val)}
-            ${selfDeleteTag}
-          </script>`,
-      )
-
-    await Promise.all(chunks.map((chunk) => chunk.value))
-    // anything else can be done now
+    }
   }
 
-  const responseClass = buffer ? BufferedStreamResponse : StreamResponse
-  return new responseClass(streamResponseWithComponents(), {
+  const { readable, writable } = new TransformStream()
+
+  const concat = async () => {
+    for (const promise of responses) {
+      const response = await promise
+      if (!response.body) continue
+      await response.body.pipeTo(writable, {
+        preventClose: timesToWait === timesWaited,
+      })
+      timesWaited++
+    }
+    await writable.close()
+  }
+
+  concat()
+
+  return new Response(readable, {
     headers: {
       'Content-Type': 'text/html',
     },

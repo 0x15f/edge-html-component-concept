@@ -5,35 +5,22 @@ export default class ComponentRewriter {
 
   protected component: Component
 
-  protected chunks: Chunk[]
-
-  protected buffer: boolean
+  protected componentResponses: Promise<Response>[]
 
   constructor(
     request: Request,
     component: Component,
-    chunks: Chunk[],
-    buffer: boolean,
+    componentResponses: Promise<Response>[],
   ) {
     this.request = request
     this.component = component
-    this.chunks = chunks
-    this.buffer = buffer
+    this.componentResponses = componentResponses
   }
 
   async element(element: Element): Promise<void> {
     const id = await hash(`component-${this.component.name}`)
-    const func = this.component.function(this.request)
-    element.setAttribute('id', id)
-    if (this.buffer)
-      this.chunks.push({
-        id,
-        name: this.component.name,
-        value: func,
-      })
-    else {
-      const payload = await func
-      element.prepend(payload)
-    }
+    element.setAttribute('component-id', id)
+
+    this.componentResponses.push(this.component.function(this.request))
   }
 }
