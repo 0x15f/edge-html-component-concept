@@ -1,5 +1,6 @@
 import hash from '../utils/hash'
 
+// This wrapper func handles generating an id for the component and proxying the resolution to support deferred components
 export default async function componentWrapper(
   component: PartialComponent,
 ): Promise<Component> {
@@ -13,8 +14,8 @@ export default async function componentWrapper(
         .function(request)
         .then((response) => response.text())
         .then(async (text) => {
-          // for testing a delay
-          await new Promise((r) => setTimeout(() => r(true), 10000))
+          // for testing
+          // await new Promise((r) => setTimeout(() => r(true), 10000))
           return new Response(
             component.options?.deferred
               ? `<script>

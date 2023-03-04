@@ -1,5 +1,3 @@
-import hash from '../utils/hash'
-
 export default class DeferredComponentRewriter {
   protected request: Request
 

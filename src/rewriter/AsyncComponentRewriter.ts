@@ -1,5 +1,3 @@
-import hash from '../utils/hash'
-
 export default class AsyncComponentRewriter {
   protected request: Request
 
@@ -18,8 +16,7 @@ export default class AsyncComponentRewriter {
   }
 
   async element(element: Element): Promise<void> {
-    const id = await hash(`component-${this.component.name}`)
-    element.setAttribute('component-id', id)
+    element.setAttribute('component-id', this.component.id)
 
     const response = await this.component.function(this.request)
     const payload = await response.text()
