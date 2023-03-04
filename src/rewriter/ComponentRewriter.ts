@@ -14,4 +14,8 @@ export default abstract class ComponentRewiter {
     this.component = component
     this.streamedResponses = streamedResponses
   }
+
+  element(element: Element): void {
+    element.setAttribute('component-id', this.component.id)
+  }
 }

@@ -11,8 +11,11 @@ export default async function componentWrapper(
     id,
     _promise: null,
     options: {
+      // by default do not block
       blocking: component.options?.blocking ?? false,
-      template: component.options?.template ?? false,
+      // by default do not remove the element used for mounting
+      template: component.options?.template ?? true,
+      // by default do not preload
       preload: component.options?.preload ?? false,
     },
   }

@@ -25,7 +25,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
         selector: '[example-fetch-data]',
       },
       options: {
-        preload: true,
+        // preload: true,
       },
       function: async () => {
         const postsPromise = fetch(
