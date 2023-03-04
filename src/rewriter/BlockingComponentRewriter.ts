@@ -1,4 +1,4 @@
-export default class DeferredComponentRewriter {
+export default class BlockingComponentRewriter {
   protected request: Request
 
   protected component: Component
@@ -15,8 +15,14 @@ export default class DeferredComponentRewriter {
     this.componentResponses = componentResponses
   }
 
-  element(element: Element): void {
+  async element(element: Element): Promise<void> {
     element.setAttribute('component-id', this.component.id)
-    this.componentResponses.push(this.component.function(this.request))
+
+    const response =  await (this.component._promise ?? this.component.function(this.request))
+    const payload = await response.text()
+    element.replace(payload, {
+      html: true,
+    })
+    if (this.component.options?.template) element.removeAndKeepContent()
   }
 }

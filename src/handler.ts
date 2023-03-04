@@ -1,7 +1,7 @@
 import { html, HTMLResponse } from '@worker-tools/html'
 import componentWrapper from './components/component-wrapper'
-import AsyncComponentRewriter from './rewriter/AsyncComponentRewriter'
-import DeferredComponentRewriter from './rewriter/DeferredComponentRewriter'
+import BlockingComponentRewriter from './rewriter/BlockingComponentRewriter'
+import NonBlockingComponentRewriter from './rewriter/NonBlockingComponentRewriter'
 
 export default async function handler(event: FetchEvent): Promise<Response> {
   const { request } = event
@@ -25,7 +25,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
         selector: '[example-fetch-data]',
       },
       options: {
-        deferred: true,
+        blocking: true,
       },
       function: async () => {
         const postsPromise = fetch(
@@ -39,19 +39,21 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       },
     },
   ]
-  for (const component of components) {
-    const { method, selector } = component.route
+
+  const requestClone = request.clone()
+  for (const partialComponent of components) {
+    const { method, selector } = partialComponent.route
     if (url.pathname.match(selector) && request.method.match(method)) {
       timesToWait++
+      const component = await componentWrapper(partialComponent)
+      if (component.options?.preload) component._promise = component.function(requestClone)
+      // preloading makes the component blocking
+      const rewriterClass = (component.options?.blocking || component.options?.preload)
+        ? BlockingComponentRewriter
+        : NonBlockingComponentRewriter
       rewriter.on(
         component.html.selector,
-        new (component.options?.deferred
-          ? DeferredComponentRewriter
-          : AsyncComponentRewriter)(
-          request.clone(),
-          await componentWrapper(component),
-          responses,
-        ),
+        new rewriterClass(requestClone, component, responses),
       )
     }
   }

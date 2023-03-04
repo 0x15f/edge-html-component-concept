@@ -1,4 +1,4 @@
-export default class AsyncComponentRewriter {
+export default class NonBlockingComponentRewriter {
   protected request: Request
 
   protected component: Component
@@ -15,14 +15,8 @@ export default class AsyncComponentRewriter {
     this.componentResponses = componentResponses
   }
 
-  async element(element: Element): Promise<void> {
+  element(element: Element): void {
     element.setAttribute('component-id', this.component.id)
-
-    const response = await this.component.function(this.request)
-    const payload = await response.text()
-    element.replace(payload, {
-      html: true,
-    })
-    if (this.component.options?.template) element.removeAndKeepContent()
+    this.componentResponses.push(this.component._deferredFunction(this.request))
   }
 }

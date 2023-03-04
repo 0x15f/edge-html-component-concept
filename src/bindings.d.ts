@@ -4,8 +4,9 @@ export {}
 
 declare global {
   interface ComponentOptions {
-    deferred?: boolean
+    blocking?: boolean
     template?: boolean
+    preload?: boolean
   }
 
   interface PartialComponent {
@@ -23,5 +24,7 @@ declare global {
 
   interface Component extends PartialComponent {
     id: string
+    _deferredFunction: (request: Request) => Promise<Response>
+    _promise: Promise<Response> | null
   }
 }
