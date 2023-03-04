@@ -2,7 +2,8 @@ name = "cloudflare-workers-template"
 main = "./dist/worker.js"
 account_id = "e56b18ce4c0cf671554cd09cd9b5e6f2"
 workers_dev = true
-compatibility_date="2022-06-09"
+compatibility_date="2023-03-03"
+compatibility_flags = ["streams_enable_constructors"]
 
 [build]
 command = "npm install && npm run build"
