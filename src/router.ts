@@ -27,12 +27,17 @@ export async function route(request: Request): Promise<Response> {
         request.headers.get('cookie'),
       )};${selfDeleteTag}</script>`
 
+    // let each promise resolve
     for (const chunk of chunks)
-      yield `<script>document.querySelector(${JSON.stringify(
-        chunk.id,
-      )}).innerHTML = ${chunk.value.then((val) =>
-        JSON.stringify(val),
-      )};${selfDeleteTag}</script>`
+      chunk.value.then(
+        (val) =>
+          yield `<script>document.querySelector(${JSON.stringify(
+            chunk.id,
+          )}).innerHTML = ${JSON.stringify(val)};${selfDeleteTag}</script>`,
+      )
+
+    await Promise.all(chunks.map((chunk) => chunk.value))
+    // anything else can be done now
   }
 
   return new StreamResponse(streamResponseWithComponents(), {

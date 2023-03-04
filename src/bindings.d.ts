@@ -8,7 +8,7 @@ declare global {
   // const MY_NAMESPACE: KVNamespace
 
   interface Component {
-    name: ''
+    name: string
     route: {
       selector: string
     }
