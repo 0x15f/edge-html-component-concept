@@ -1,4 +1,4 @@
-import { BufferedStreamResponse, StreamResponse } from '@worker-tools/shed'
+import { BufferedStreamResponse, html, StreamResponse } from '@worker-tools/shed'
 import ComponentRewriter from './rewriter/ComponentRewriter'
 
 export async function route(request: Request): Promise<StreamResponse> {
@@ -6,16 +6,19 @@ export async function route(request: Request): Promise<StreamResponse> {
   const url = new URL(request.url)
 
   const buffer = !url.searchParams.has('_buffer')
+  // todo: build/store manifest (maybe using cache api rather than kv)
+  const manifest = []
   const components: Component[] = []
   const chunks: Chunk[] = []
 
   const requestClone = request.clone()
   components.forEach((component) => {
     if (url.pathname.match(component.route.selector))
-      rewriter.on(
-        component.html.selector,
-        new ComponentRewriter(requestClone, component, chunks, buffer),
-      )
+      if (!manifest.length)
+        rewriter.on(
+          component.html.selector,
+          new ComponentRewriter(requestClone, component, chunks, buffer),
+        )
   })
 
   async function* streamResponseWithComponents() {
@@ -39,12 +42,16 @@ export async function route(request: Request): Promise<StreamResponse> {
       )
 
     await Promise.all(chunks.map((chunk) => chunk.value))
+    yield html`<div>test</div>`
     // anything else can be done now
   }
 
-  return new (buffer ? BufferedStreamResponse : StreamResponse)(streamResponseWithComponents(), {
-    headers: {
-      'Content-Type': 'text/html',
+  return new (buffer ? BufferedStreamResponse : StreamResponse)(
+    streamResponseWithComponents(),
+    {
+      headers: {
+        'Content-Type': 'text/html',
+      },
     },
-  })
+  )
 }
