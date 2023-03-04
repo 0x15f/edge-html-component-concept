@@ -28,10 +28,14 @@ export default async function handler(event: FetchEvent): Promise<Response> {
         deferred: true,
       },
       function: async () => {
-        return new HTMLResponse(
-          html`<p>This is a test to insert this component into the page via the
-          server</p>`,
-        )
+        const postsPromise = fetch(
+          'https://jsonplaceholder.typicode.com/posts/1',
+        ).then((r) => r.text())
+
+        return new HTMLResponse(html`
+          <h1>This was fetched and injected via the edge!</h1>
+          <p>Post data: ${postsPromise}.</p>
+        `)
       },
     },
   ]
