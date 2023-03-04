@@ -25,7 +25,6 @@ export default async function handler(event: FetchEvent): Promise<Response> {
         selector: '[example-fetch-data]',
       },
       options: {
-        blocking: true,
         preload: true,
       },
       function: async () => {

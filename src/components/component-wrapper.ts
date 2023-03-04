@@ -12,8 +12,8 @@ export default async function componentWrapper(
     _promise: null,
     options: {
       blocking: component.options?.blocking ?? false,
-      template: component.options?.blocking ?? false,
-      preload: component.options?.blocking ?? false,
+      template: component.options?.template ?? false,
+      preload: component.options?.preload ?? false,
     },
   }
 }
