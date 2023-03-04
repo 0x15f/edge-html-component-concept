@@ -12,12 +12,18 @@ export default async function componentWrapper(
       component
         .function(request)
         .then((response) => response.text())
-        .then((text) => {
-          return new Response(`<script>
-      document.querySelector('[component-id="${id}"]').innerHTML =
-        ${JSON.stringify(text)};
-        const _self = document.currentScript;_self.parentNode.removeChild(_self)
-    </script>`)
+        .then(async (text) => {
+          // for testing a delay
+          await new Promise((r) => setTimeout(() => r(true), 10000))
+          return new Response(
+            component.options?.deferred
+              ? `<script>
+          document.querySelector('[component-id="${id}"]').innerHTML =
+            ${JSON.stringify(text)};
+            const _self = document.currentScript;_self.parentNode.removeChild(_self)
+        </script>`
+              : text,
+          )
         }),
   }
 }

@@ -1,5 +1,6 @@
 import componentWrapper from './components/component-wrapper'
-import ComponentRewriter from './rewriter/ComponentRewriter'
+import AsyncComponentRewriter from './rewriter/AsyncComponentRewriter'
+import DeferredComponentRewriter from './rewriter/DeferredComponentRewriter'
 
 export default async function handler(event: FetchEvent): Promise<Response> {
   const { request } = event
@@ -14,7 +15,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   let timesWaited = 0
   const components: PartialComponent[] = [
     {
-      name: 'Jake Test',
+      name: 'test',
       route: {
         method: 'GET',
         selector: '/',
@@ -22,9 +23,12 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       html: {
         selector: '[example-fetch-data]',
       },
+      options: {
+        deferred: true,
+      },
       function: async () => {
         return new Response(
-          'This is jakes test data to insert into this component via the server',
+          'This is a test to insert this component into the page via the server',
         )
       },
     },
@@ -35,7 +39,9 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       timesToWait++
       rewriter.on(
         component.html.selector,
-        new ComponentRewriter(
+        new (component.options?.deferred
+          ? DeferredComponentRewriter
+          : AsyncComponentRewriter)(
           request.clone(),
           await componentWrapper(component),
           responses,

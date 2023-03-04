@@ -6,6 +6,11 @@ export {}
  * Declare kv namespaces here so using them does not throw type errors
  */
 declare global {
+  interface ComponentOptions {
+    deferred?: boolean
+    template?: boolean
+  }
+
   interface PartialComponent {
     name: string
     route: {
@@ -15,6 +20,7 @@ declare global {
     html: {
       selector: string
     }
+    options?: ComponentOptions
     function: (request: Request) => Promise<Response>
   }
 
