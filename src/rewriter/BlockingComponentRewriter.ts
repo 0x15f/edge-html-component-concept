@@ -4,11 +4,10 @@ export default class BlockingComponentRewriter extends ComponentRewiter {
   async element(element: Element): Promise<void> {
     super.element(element)
 
-    const response = await (this.component._promise ?? this.component.function(this.request))
+    const response = await (this.component._promise ??
+      this.component.function(this.request))
     const payload = await response.text()
-    const elementFunc = this.component.options.template
-      ? 'replace'
-      : 'prepend'
+    const elementFunc = this.component.options.template ? 'replace' : 'prepend'
     element[elementFunc](payload, {
       html: true,
     })

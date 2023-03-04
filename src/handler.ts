@@ -8,10 +8,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 
-  const ignoreRoutes = [
-    '/cart.js',
-    '/cart/update.js',
-  ]
+  const ignoreRoutes = ['/cart.js', '/cart/update.js']
   if (ignoreRoutes.includes(url.pathname)) return fetch(request)
 
   const streamedResponses: Promise<Response>[] = [
