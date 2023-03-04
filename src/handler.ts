@@ -8,12 +8,20 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 
+  const ignoreRoutes = [
+    '/cart.js',
+    '/cart/update.js',
+  ]
+  if (ignoreRoutes.includes(url.pathname)) return fetch(request)
+
   const streamedResponses: Promise<Response>[] = [
     fetch(request).then((response) => rewriter.transform(response)),
   ]
 
-  let timesToWait = 1
-  let timesWaited = 0
+  const streamConfig = {
+    totalStreams: 1,
+    streamsSent: 0,
+  }
   const partialComponents: PartialComponent[] = [
     {
       name: 'test',
@@ -26,6 +34,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       },
       options: {
         // preload: true,
+        blocking: true,
       },
       function: async () => {
         const postsPromise = fetch(
@@ -44,7 +53,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   for (const partialComponent of partialComponents) {
     const { method, selector } = partialComponent.route
     if (url.pathname.match(selector) && request.method.match(method)) {
-      timesToWait++
+      streamConfig.totalStreams++
       const component = await componentWrapper(partialComponent)
       if (component.options.preload)
         component._promise = component.function(requestClone)
@@ -67,9 +76,9 @@ export default async function handler(event: FetchEvent): Promise<Response> {
       const response = await promise
       if (!response.body) continue
       await response.body.pipeTo(writable, {
-        preventClose: timesToWait !== timesWaited,
+        preventClose: streamConfig.totalStreams !== streamConfig.streamsSent,
       })
-      timesWaited++
+      streamConfig.streamsSent++
     }
     await writable.close()
   }

@@ -15,7 +15,7 @@ export default class NonBlockingComponentRewriter extends ComponentRewiter {
       ${
         this.component.options.template
           ? `
-      el.insertAdjacentHTML('beforeStart', ${JSON.stringify(text)});
+      el.insertAdjacentHTML('beforeBegin', ${JSON.stringify(text)});
       el.remove();`
           : `el.innerHTML = ${JSON.stringify(text)}`
       }
