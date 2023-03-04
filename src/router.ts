@@ -17,19 +17,22 @@ export async function route(request: Request): Promise<Response> {
   })
 
   async function* streamResponseWithComponents() {
-    yield fetch(request).then((res) =>
-      rewriter
-        .transform(res)
-        .text()
-        .then((body) => body.replace('</html>', '')),
-    )
+    const selfDeleteTag =
+      'const _self = document.currentScript;self.parentNode.removeChild(_self)'
+    // awaited to prevent streaming of chunks prior to origin shell
+    const response = await fetch(request)
+    yield rewriter.transform(response).text()
+    if (request.headers.has('cookie'))
+      yield `<script>document.cookie = ${JSON.stringify(
+        request.headers.get('cookie'),
+      )};${selfDeleteTag}</script>`
+
     for (const chunk of chunks)
-      yield `<script>document.querySelector('${
-        chunk.id
-      }').innerHTML = ${chunk.value.then((val) =>
+      yield `<script>document.querySelector(${JSON.stringify(
+        chunk.id,
+      )}).innerHTML = ${chunk.value.then((val) =>
         JSON.stringify(val),
-      )}</script>`
-    yield '</html>'
+      )};${selfDeleteTag}</script>`
   }
 
   return new StreamResponse(streamResponseWithComponents(), {
