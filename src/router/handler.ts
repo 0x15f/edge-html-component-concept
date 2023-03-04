@@ -22,6 +22,7 @@ export default async function handler({
   const chunks: any[] = []
 
   // todo: "before" plugins
+  // this is the main concept, parallel data fetching to origin payload download, the html thing less important
 
   class RunEdgePlugin {
     protected plugin: any
