@@ -15,16 +15,5 @@ export default async function componentWrapper(
       template: component.options?.blocking ?? false,
       preload: component.options?.blocking ?? false,
     },
-    _deferredFunction: async (request) =>
-      component
-        .function(request)
-        .then((response) => response.text())
-        .then(async (text) => {
-          return new Response(`<script>
-          document.querySelector('[component-id="${id}"]').innerHTML =
-            ${JSON.stringify(text)};
-            const _self = document.currentScript;_self.parentNode.removeChild(_self)
-        </script>`)
-        }),
   }
 }

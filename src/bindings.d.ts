@@ -30,7 +30,6 @@ declare global {
 
   interface Component extends PartialComponent {
     id: string
-    _deferredFunction: (request: Request) => Promise<Response>
     _promise: Promise<Response> | null
     options: ComponentOptions
   }
