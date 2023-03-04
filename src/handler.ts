@@ -1,3 +1,4 @@
+import { html, HTMLResponse } from '@worker-tools/html'
 import componentWrapper from './components/component-wrapper'
 import AsyncComponentRewriter from './rewriter/AsyncComponentRewriter'
 import DeferredComponentRewriter from './rewriter/DeferredComponentRewriter'
@@ -27,8 +28,9 @@ export default async function handler(event: FetchEvent): Promise<Response> {
         deferred: true,
       },
       function: async () => {
-        return new Response(
-          'This is a test to insert this component into the page via the server',
+        return new HTMLResponse(
+          html`<p>This is a test to insert this component into the page via the
+          server</p>`,
         )
       },
     },

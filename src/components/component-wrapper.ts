@@ -14,8 +14,8 @@ export default async function componentWrapper(
         .function(request)
         .then((response) => response.text())
         .then(async (text) => {
-          // for testing
-          // await new Promise((r) => setTimeout(() => r(true), 10000))
+            // for testing
+            // await new Promise((r) => setTimeout(() => r(true), 10000))
           return new Response(
             component.options?.deferred
               ? `<script>

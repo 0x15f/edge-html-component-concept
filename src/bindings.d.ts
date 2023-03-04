@@ -2,9 +2,6 @@ import { Method } from '@worker-tools/shed'
 
 export {}
 
-/**
- * Declare kv namespaces here so using them does not throw type errors
- */
 declare global {
   interface ComponentOptions {
     deferred?: boolean
