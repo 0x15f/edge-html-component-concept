@@ -1,20 +1,6 @@
-export default class BlockingComponentRewriter {
-  protected request: Request
+import ComponentRewiter from "./ComponentRewriter"
 
-  protected component: Component
-
-  protected componentResponses: Promise<Response>[]
-
-  constructor(
-    request: Request,
-    component: Component,
-    componentResponses: Promise<Response>[],
-  ) {
-    this.request = request
-    this.component = component
-    this.componentResponses = componentResponses
-  }
-
+export default class BlockingComponentRewriter extends ComponentRewiter {
   async element(element: Element): Promise<void> {
     element.setAttribute('component-id', this.component.id)
 

@@ -8,13 +8,13 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   const rewriter = new HTMLRewriter()
   const url = new URL(request.url)
 
-  const responses: Promise<Response>[] = [
+  const streamedResponses: Promise<Response>[] = [
     fetch(request).then((response) => rewriter.transform(response)),
   ]
 
   let timesToWait = 1
   let timesWaited = 0
-  const components: PartialComponent[] = [
+  const partialComponents: PartialComponent[] = [
     {
       name: 'test',
       route: {
@@ -41,7 +41,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
   ]
 
   const requestClone = request.clone()
-  for (const partialComponent of components) {
+  for (const partialComponent of partialComponents) {
     const { method, selector } = partialComponent.route
     if (url.pathname.match(selector) && request.method.match(method)) {
       timesToWait++
@@ -55,15 +55,15 @@ export default async function handler(event: FetchEvent): Promise<Response> {
           : NonBlockingComponentRewriter
       rewriter.on(
         component.html.selector,
-        new rewriterClass(requestClone, component, responses),
+        new rewriterClass(requestClone, component, streamedResponses),
       )
     }
   }
 
   const { readable, writable } = new TransformStream()
 
-  const concat = async () => {
-    for (const promise of responses) {
+  const waitForPromisesAndWriteResponses = async () => {
+    for (const promise of streamedResponses) {
       const response = await promise
       if (!response.body) continue
       await response.body.pipeTo(writable, {
@@ -74,7 +74,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
     await writable.close()
   }
 
-  concat()
+  waitForPromisesAndWriteResponses()
 
   return new Response(readable, {
     headers: {

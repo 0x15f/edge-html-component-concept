@@ -1,24 +1,10 @@
-export default class NonBlockingComponentRewriter {
-  protected request: Request
+import ComponentRewiter from "./ComponentRewriter"
 
-  protected component: Component
-
-  protected componentResponses: Promise<Response>[]
-
-  constructor(
-    request: Request,
-    component: Component,
-    componentResponses: Promise<Response>[],
-  ) {
-    this.request = request
-    this.component = component
-    this.componentResponses = componentResponses
-  }
-
+export default class NonBlockingComponentRewriter extends ComponentRewiter {
   element(element: Element): void {
     element.setAttribute('component-id', this.component.id)
 
-    this.componentResponses.push(
+    this.streamedResponses.push(
       (this.component._promise ?? this.component.function(this.request))
         .then((response) => response.text())
         .then(async (text) => {
