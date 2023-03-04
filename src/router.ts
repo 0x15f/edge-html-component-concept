@@ -18,7 +18,7 @@ export async function route(request: Request): Promise<Response> {
 
   async function* streamResponseWithComponents() {
     const selfDeleteTag =
-      'const _self = document.currentScript;self.parentNode.removeChild(_self)'
+      'const _self = document.currentScript;_self.parentNode.removeChild(_self)'
     // awaited to prevent streaming of chunks prior to origin shell
     const response = await fetch(request)
     yield rewriter.transform(response).text()
