@@ -1,12 +1,13 @@
 # Edge Components w/ HTML Streaming
 
-This is a concept repo.
-- It is all built using TransformStream’s
-- It supports blocking and non-blocking components
-- It supports sub-streams with blocking and non-blocking components
-- It is all built around the Request interface, so independent edge caching can be applied to every level.
-    - This also makes the concept compatible with existing edge-based solutions
-    - This also allows the rendering of components to be offloaded to workers for platforms
+This is a concept repo that provides a Cloudflare Worker that can run over a partially client-side or fully server-side rendered website and inject "components". Components can be blocking or non-blocking. This is heavily based on concepts taken from RSC, Remix, and HTML Streaming in general. 
+
+- It is all built using TransformStream’s.
+- It supports blocking and non-blocking components.
+- It supports sub-streams with blocking and non-blocking components.
+- It is all built around the Request interface:
+    - Independent caching can be applied to every level of the component tree.
+    - Components can be moved to Workers for Platforms
 
 # The Problem
 
@@ -16,15 +17,7 @@ On FashionNova’s PLP, the request to Algolia that fetches critical data requir
 
 ************************************************FN does use a heavily client-side rendered Shopify Theme. Taking a more liquid-based approach would have had better performance. However, Liquid still cannot fetch data from Algolia.************************************************
 
-# The (Potential) Solution
+# Inspirations
 
-## Inspirations
-
-- Remix - There is no server state or client state. It is all forms that can rerender. Responses are also streamed as they are built so that you do not have to wait for all data to be fetched for the entire page to render.
-- EdgeMesh - Dynamic fragments, uncached fragments of the page that are loaded via web-worker for swift page loads with partial full page caching.
-
-## Concept
-
-Shopify Theme (origin) provides a page shell. Edge fetches the shell in parallel with fetching and rendering a basic product grid, filtering, and pagination. All functionality is in a form that submits (prevented) and refreshes the current "component.”
-
-The HTMLRewriter is used to go over the original page contents and inject rendered components. While doing so, it builds a map that can be memoized to allow for parallel rendering of components and fetching of the original page on future requests.
+- [Remix](https://remix.run) - There is no server state or client state. It is all forms that can rerender. Responses are also streamed as they are built so that you do not have to wait for all data to be fetched for the entire page to render.
+- [EdgeMesh](https://edgemesh.com) - Dynamic fragments, uncached fragments of the page that are loaded via web-worker for swift page loads with partial full page caching.
