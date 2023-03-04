@@ -15,7 +15,7 @@ export default class DeferredComponentRewriter {
     this.componentResponses = componentResponses
   }
 
-  async element(element: Element): Promise<void> {
+  element(element: Element): void {
     element.setAttribute('component-id', this.component.id)
     this.componentResponses.push(this.component.function(this.request))
   }
