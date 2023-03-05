@@ -1,6 +1,6 @@
-import ComponentRewiter from './ComponentRewriter'
+import AbstractComponentRewiter from './AbstractComponentRewriter'
 
-export default class BlockingComponentRewriter extends ComponentRewiter {
+export default class BlockingComponentRewriter extends AbstractComponentRewiter {
   async element(element: Element): Promise<void> {
     super.element(element)
 

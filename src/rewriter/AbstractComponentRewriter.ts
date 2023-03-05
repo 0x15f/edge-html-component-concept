@@ -1,4 +1,4 @@
-export default abstract class ComponentRewiter {
+export default abstract class AbstractComponentRewiter {
   protected request: Request
 
   protected component: Component
