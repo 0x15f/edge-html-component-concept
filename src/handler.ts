@@ -46,14 +46,13 @@ export default async function handler(event: FetchEvent): Promise<Response> {
     },
   ]
 
-  const requestClone = request.clone()
   for (const partialComponent of partialComponents) {
     const { method, selector } = partialComponent.route
     if (url.pathname.match(selector) && request.method.match(method)) {
       streamConfig.totalStreams++
       const component = await componentWrapper(partialComponent)
       if (component.options.preload)
-        component._promise = component.function(requestClone)
+        component._promise = component.function()
       // preloading makes the component blocking
       const rewriterClass =
         component.options.blocking || component.options.preload
@@ -61,7 +60,7 @@ export default async function handler(event: FetchEvent): Promise<Response> {
           : NonBlockingComponentRewriter
       rewriter.on(
         component.html.selector,
-        new rewriterClass(requestClone, component, streamedResponses),
+        new rewriterClass(component, streamedResponses),
       )
     }
   }

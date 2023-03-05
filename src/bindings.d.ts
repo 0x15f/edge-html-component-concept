@@ -25,7 +25,7 @@ declare global {
       selector: string
     }
     options?: PartialComponentOptions
-    function: (request: Request) => Promise<Response>
+    function: () => Promise<Response>
   }
 
   interface Component extends PartialComponent {

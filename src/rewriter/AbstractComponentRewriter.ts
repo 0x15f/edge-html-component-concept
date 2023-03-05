@@ -1,16 +1,13 @@
 export default abstract class AbstractComponentRewiter {
-  protected request: Request
 
   protected component: Component
 
   protected streamedResponses: Promise<Response>[]
 
   constructor(
-    request: Request,
     component: Component,
     streamedResponses: Promise<Response>[],
   ) {
-    this.request = request
     this.component = component
     this.streamedResponses = streamedResponses
   }

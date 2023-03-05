@@ -5,7 +5,7 @@ export default class BlockingComponentRewriter extends AbstractComponentRewiter 
     super.element(element)
 
     const response = await (this.component._promise ??
-      this.component.function(this.request))
+      this.component.function())
     const payload = await response.text()
     const elementFunc = this.component.options.template ? 'replace' : 'prepend'
     element[elementFunc](payload, {

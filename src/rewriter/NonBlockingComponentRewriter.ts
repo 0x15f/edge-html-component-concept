@@ -7,7 +7,7 @@ export default class NonBlockingComponentRewriter extends AbstractComponentRewit
     // this does not seem very performant
     // todo: maybe i inject response as a "chunk" and then inject a script to move the chunk? that way i can use the html response as a stream, and I can write to it
     this.streamedResponses.push(
-      (this.component._promise ?? this.component.function(this.request))
+      (this.component._promise ?? this.component.function())
         .then((response) => response.text())
         .then(async (text) => {
           return new Response(`<script>
